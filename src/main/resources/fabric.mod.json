@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "swing",
+	"version": "${version}",
+	"name": "Swing",
+	"description": "Client-only: first-person held item scale and visual swing speed.",
+	"authors": ["Spencer Kelly"],
+	"license": "CC0-1.0",
+	"icon": "assets/itemtweaks/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["com.example.itemtweaks.client.ItemTweaksClient"]
+	},
+	"mixins": [
+		"swing.mixins.json",
+		{
+			"config": "swing.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
