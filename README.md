@@ -2,7 +2,7 @@
 
 Client-only Fabric mod for Minecraft 26.2. Scales down the item in your first-person hand and lets you slow the swing animation. Nothing on the server changes, so this is visual only.
 
-I made this because the usual "viewmodel" mods come packed with a pile of extra features I already get from other mods. I play Hypixel Skyblock. I wanted a small jar I could edit by changing a few constants and rebuilding.
+I made this because the usual "viewmodel" skyblock mods come packed with a pile of extra features I already get from other mods.
 
 ## Settings
 
