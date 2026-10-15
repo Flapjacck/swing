@@ -1,15 +1,15 @@
 # Swing
 
-Client-only Fabric mod for Minecraft 26.2. Scales the item in your first-person hand and lets you speed up or slow down the swing animation. Nothing on the server changes, so this is visual only.
+Client-only Fabric mod for Minecraft 26.2. Scales down the item in your first-person hand and lets you slow the swing animation. Nothing on the server changes, so this is visual only.
 
 I made this because the usual "viewmodel" mods come packed with a pile of extra features I already get from other mods. I play Hypixel Skyblock. I wanted a small jar I could edit by changing a few constants and rebuilding.
 
 ## Settings
 
-All knobs are in `src/main/java/com/example/itemtweaks/ItemTweaksConfig.java`. Change a number, rebuild, drop the new jar in `mods`.
+In game, run `/swing`. That opens a dark settings panel with sliders and a number box for each value (0.10–1.00, step 0.01). Defaults are vanilla `1.00` / `1.00`. Values apply live, save to `config/swing.json` on Apply or Close, and reload next launch.
 
-- `HELD_ITEM_SCALE` (default 0.75): size of the first-person held item. 1.0 is vanilla.
-- `SWING_SPEED_MULTIPLIER` (default 1.0): arm swing animation. Above 1 is faster, below 1 is slower.
+- Held item scale: size of the first-person held item. `1.00` is vanilla.
+- Swing speed: arm swing animation. `1.00` is vanilla; lower is slower.
 
 Scaling does not apply in third person / F5.
 
