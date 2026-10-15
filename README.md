@@ -1,4 +1,18 @@
-# Swing
+<p align="center">
+  <img src="src/main/resources/assets/itemtweaks/icon.png" alt="Swing icon" width="128" height="128">
+</p>
+
+<h1 align="center">Swing</h1>
+
+<p align="center">
+  <a href="https://www.minecraft.net"><img src="https://img.shields.io/badge/Minecraft-26.2-62B47A?style=flat-square&logo=minecraft&logoColor=white" alt="Minecraft 26.2"></a>
+  <a href="https://fabricmc.net"><img src="https://img.shields.io/badge/Fabric%20Loader-0.19.5-DBD0B4?style=flat-square" alt="Fabric Loader 0.19.5"></a>
+  <a href="https://modrinth.com/mod/fabric-api"><img src="https://img.shields.io/badge/Fabric%20API-0.161.0%2B26.2-DBD0B4?style=flat-square" alt="Fabric API 0.161.0+26.2"></a>
+  <a href="https://adoptium.net"><img src="https://img.shields.io/badge/Java-25-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java 25"></a>
+  <a href="https://gradle.org"><img src="https://img.shields.io/badge/Gradle-9.7.1-02303A?style=flat-square&logo=gradle&logoColor=white" alt="Gradle 9.7.1"></a>
+  <a href="https://github.com/Flapjacck/swing/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/Flapjacck/swing/build.yml?style=flat-square&logo=githubactions&logoColor=white&label=Build" alt="Build status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-CC0%201.0-lightgrey?style=flat-square" alt="License CC0 1.0"></a>
+</p>
 
 Client-only Fabric mod for Minecraft 26.2. Scales down the item in your first-person hand and lets you slow the swing animation. Nothing on the server changes, so this is visual only.
 
