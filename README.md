@@ -14,18 +14,31 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-CC0%201.0-lightgrey?style=flat-square" alt="License CC0 1.0"></a>
 </p>
 
-Client-only Fabric mod for Minecraft 26.2. Scales down the item in your first-person hand and lets you slow the swing animation. Nothing on the server changes, so this is visual only.
+Client-only Fabric mod for Minecraft 26.2. Tweaks your first-person viewmodel — item scale, swing speed, positional offsets, and tilt. Nothing server-side changes.
 
 I made this because the usual "viewmodel" skyblock mods come packed with a pile of extra features I already get from other mods.
 
 ## Settings
 
-In game, run `/swing`. That opens a dark settings panel with sliders and a number box for each value (0.10–1.00, step 0.01). Defaults are vanilla `1.00` / `1.00`. Values apply live, save to `config/swing.json` on Apply or Close, and reload next launch.
+Run `/swing` in game. A scrollable dark settings panel opens with sliders and number boxes for every value. Changes apply live, save to `config/swing.json` on close, and reload on next launch. All defaults are vanilla.
 
-- Held item scale: size of the first-person held item. `1.00` is vanilla.
-- Swing speed: arm swing animation. `1.00` is vanilla; lower is slower.
+### Swing speed
+- **Swing speed** (`1.00` = vanilla, lower is slower) — visual only, no server-side combat change
+- **Ignore Haste** toggle — when ON, the animation ignores haste / mining fatigue so swing speed stays constant across gear sets and islands
 
-Scaling does not apply in third person / F5.
+### Held item scale
+- **Held item scale** (`1.00` = vanilla) — scales the first-person item model
+- **Apply Hand Scale** toggle — when ON, also scales the bare arm mesh when holding nothing
+
+### Item offsets & tilt
+- **Item X / Y / Z** — positional offset for the held item model (`-1.00` to `1.00`)
+- **Item Pitch / Roll** — X and Z rotation for the held item (`-90` to `90°`)
+
+### Arm offsets & tilt (requires Apply Hand Scale ON)
+- **Arm X / Y / Z** — positional offset for the bare arm (`-1.00` to `1.00`)
+- **Arm Pitch / Roll** — X and Z rotation for the bare arm (`-90` to `90°`)
+
+Scaling and offsets do not apply in third person / F5.
 
 ## Build
 
@@ -35,7 +48,7 @@ Needs JDK 25.
 ./gradlew build
 ```
 
-Use `build/libs/fabric-swing-1.0.0.jar`. Skip the `-sources` jar.
+Use `build/libs/fabric-swing-1.5.0.jar`. Skip the `-sources` jar.
 
 Dev launch:
 
