@@ -19,7 +19,7 @@ public class SwingSettingsScreen extends Screen {
 
 	// --- Layout ---
 	private static final int PANEL_W = 320;
-	private static final int PANEL_H = 178;
+	private static final int PANEL_H = 214;  // expanded to fit ignore-haste toggle row
 	private static final int PAD     = 18;   // horizontal inset on both sides
 	// Slider + 8px gap + box fills the inner width exactly: 320 - 2*18 = 284 = 224 + 8 + 52
 	private static final int SLIDER_W = 224;
@@ -29,13 +29,14 @@ public class SwingSettingsScreen extends Screen {
 	private static final int BTN_GAP  = 8;
 
 	// Vertical offsets from panel top
-	private static final int TITLE_Y      = 14;
-	private static final int ROW1_LABEL_Y = 38;
-	private static final int ROW1_CTRL_Y  = 52;
-	private static final int ROW2_LABEL_Y = 88;
-	private static final int ROW2_CTRL_Y  = 102;
-	private static final int SEPARATOR_Y  = 138;
-	private static final int BTN_Y        = 148;
+	private static final int TITLE_Y        = 14;
+	private static final int ROW1_LABEL_Y   = 38;
+	private static final int ROW1_CTRL_Y    = 52;
+	private static final int TOGGLE_Y       = 80;  // ignore-haste toggle, 8px below ROW1 controls
+	private static final int ROW2_LABEL_Y   = 114;
+	private static final int ROW2_CTRL_Y    = 128;
+	private static final int SEPARATOR_Y    = 164;
+	private static final int BTN_Y          = 176;
 
 	// --- Colors (ARGB) ---
 	private static final int COL_BACKDROP    = 0xB0060609;
@@ -59,6 +60,7 @@ public class SwingSettingsScreen extends Screen {
 	private FloatSlider swingSlider, scaleSlider;
 	private EditBox     swingBox,    scaleBox;
 	private Button      resetBtn;
+	private Button      hasteToggleBtn;
 
 	public SwingSettingsScreen() {
 		super(Component.literal("Swing Settings"));
@@ -73,6 +75,11 @@ public class SwingSettingsScreen extends Screen {
 		this.swingSlider = addRenderableWidget(new FloatSlider(inner, r1y, SLIDER_W, CTRL_H,
 				"Swing speed", ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing, this.font));
 		this.swingBox = addBox(inner + SLIDER_W + 8, r1y, ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing);
+
+		// Toggle that makes swing duration constant by ignoring haste/mining-fatigue effects.
+		this.hasteToggleBtn = addRenderableWidget(Button.builder(
+				Component.literal(hasteToggleLabel()), b -> toggleIgnoreHaste())
+				.bounds(inner, py + TOGGLE_Y, SLIDER_W + 8 + BOX_W, CTRL_H).build());
 
 		int r2y = py + ROW2_CTRL_Y;
 		this.scaleSlider = addRenderableWidget(new FloatSlider(inner, r2y, SLIDER_W, CTRL_H,
@@ -103,6 +110,18 @@ public class SwingSettingsScreen extends Screen {
 			catch (NumberFormatException ignored) {} // user still typing, wait it out
 		});
 		return addRenderableWidget(box);
+	}
+
+	/** Returns the button label reflecting the current IGNORE_HASTE state. */
+	private static String hasteToggleLabel() {
+		return ItemTweaksConfig.IGNORE_HASTE ? "Ignore Haste: ON" : "Ignore Haste: OFF";
+	}
+
+	private void toggleIgnoreHaste() {
+		ItemTweaksConfig.IGNORE_HASTE = !ItemTweaksConfig.IGNORE_HASTE;
+		if (this.hasteToggleBtn != null) {
+			this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
+		}
 	}
 
 	private void applySwing(double raw) {
@@ -141,6 +160,7 @@ public class SwingSettingsScreen extends Screen {
 		this.scaleSlider.setFromFloat(ItemTweaksConfig.HELD_ITEM_SCALE);
 		this.swingBox.setValue(fmt(ItemTweaksConfig.SWING_SPEED_MULTIPLIER));
 		this.scaleBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_SCALE));
+		this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
 		this.syncing = false;
 	}
 
@@ -188,14 +208,14 @@ public class SwingSettingsScreen extends Screen {
 		graphics.fill(px + PAD, py + SEPARATOR_Y, pr - PAD, py + SEPARATOR_Y + 1, COL_SEPARATOR);
 	}
 
-	/** Title (centered) and the two muted section labels drawn directly in the background pass. */
+	/** Title (centered) and section labels drawn directly in the background pass. */
 	private void renderLabels(GuiGraphicsExtractor graphics) {
 		int px = panelX(), py = panelY();
 		String title = "Swing Settings";
 		graphics.text(this.font, title, px + (PANEL_W - this.font.width(title)) / 2,
 				py + TITLE_Y, COL_TITLE, true);
 		graphics.text(this.font, "Swing Speed",     px + PAD, py + ROW1_LABEL_Y, COL_LABEL, false);
-		graphics.text(this.font, "Held Item Scale",  px + PAD, py + ROW2_LABEL_Y, COL_LABEL, false);
+		graphics.text(this.font, "Held Item Scale", px + PAD, py + ROW2_LABEL_Y, COL_LABEL, false);
 	}
 
 	private int panelX() { return (this.width  - PANEL_W) / 2; }
