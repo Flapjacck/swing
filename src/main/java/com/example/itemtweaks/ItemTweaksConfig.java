@@ -21,12 +21,20 @@ public final class ItemTweaksConfig {
 	public static final float MAX = 1.0f;
 	public static final float DEFAULT_HELD_ITEM_SCALE = 1.0f;
 	public static final float DEFAULT_SWING_SPEED = 1.0f;
+	public static final boolean DEFAULT_IGNORE_HASTE = false;
 
 	/** First-person held item size. 1.0 = vanilla. */
 	public static float HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
 
 	/** Arm-swing animation speed. 1.0 = vanilla; lower is slower. Visual only. */
 	public static float SWING_SPEED_MULTIPLIER = DEFAULT_SWING_SPEED;
+
+	/**
+	 * When true, the swing-duration mixin ignores haste / mining-fatigue and
+	 * always starts from the vanilla base of 6 ticks before applying the
+	 * multiplier.  Keeps animation speed constant across islands and gear sets.
+	 */
+	public static boolean IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -39,6 +47,7 @@ public final class ItemTweaksConfig {
 	public static void resetToVanilla() {
 		HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
 		SWING_SPEED_MULTIPLIER = DEFAULT_SWING_SPEED;
+		IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
 	}
 
 	public static void load() {
@@ -54,6 +63,7 @@ public final class ItemTweaksConfig {
 			}
 			HELD_ITEM_SCALE = clamp(data.heldItemScale);
 			SWING_SPEED_MULTIPLIER = clamp(data.swingSpeedMultiplier);
+			IGNORE_HASTE = data.ignoreHaste;
 		} catch (Exception e) {
 			ItemTweaks.LOGGER.warn("Could not read {}, using vanilla defaults", file, e);
 			resetToVanilla();
@@ -68,6 +78,7 @@ public final class ItemTweaksConfig {
 				FileData data = new FileData();
 				data.heldItemScale = clamp(HELD_ITEM_SCALE);
 				data.swingSpeedMultiplier = clamp(SWING_SPEED_MULTIPLIER);
+				data.ignoreHaste = IGNORE_HASTE;
 				GSON.toJson(data, writer);
 			}
 		} catch (IOException e) {
@@ -82,5 +93,6 @@ public final class ItemTweaksConfig {
 	private static final class FileData {
 		float heldItemScale = DEFAULT_HELD_ITEM_SCALE;
 		float swingSpeedMultiplier = DEFAULT_SWING_SPEED;
+		boolean ignoreHaste = DEFAULT_IGNORE_HASTE;
 	}
 }
