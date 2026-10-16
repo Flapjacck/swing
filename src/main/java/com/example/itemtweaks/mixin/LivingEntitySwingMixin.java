@@ -13,14 +13,30 @@ import com.example.itemtweaks.ItemTweaksConfig;
  * VISUAL SWING ANIMATION SPEED (client only).
  * LivingEntity#getCurrentSwingDuration() is used to advance the arm swing.
  * Dividing it speeds the animation up. Does not change server-side combat.
+ *
+ * When IGNORE_HASTE is enabled, the vanilla base of 6 ticks is used instead
+ * of the haste-affected value, so animation speed stays constant regardless
+ * of potion effects or gear that grants mining speed / haste.
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntitySwingMixin {
+
+	/** Vanilla swing duration with no haste or mining fatigue (ticks). */
+	private static final int VANILLA_BASE_DURATION = 6;
+
 	@Inject(method = "getCurrentSwingDuration", at = @At("RETURN"), cancellable = true)
 	private void itemtweaks$scaleSwingDuration(CallbackInfoReturnable<Integer> cir) {
 		float mult = ItemTweaksConfig.SWING_SPEED_MULTIPLIER;
-		if (mult == 1.0f || mult <= 0f) return;
+
+		// Determine the base duration to scale from.
+		// When ignoreHaste is on, always use the no-haste base so the animation
+		// is identical everywhere regardless of active status effects or gear.
+		int base = ItemTweaksConfig.IGNORE_HASTE ? VANILLA_BASE_DURATION : cir.getReturnValueI();
+
+		if (mult == 1.0f && !ItemTweaksConfig.IGNORE_HASTE) return; // nothing to change
+		if (mult <= 0f) return;
+
 		// Must stay >= 1 tick or the swing never completes properly.
-		cir.setReturnValue(Math.max(1, Math.round(cir.getReturnValueI() / mult)));
+		cir.setReturnValue(Math.max(1, Math.round(base / mult)));
 	}
 }
