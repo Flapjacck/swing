@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
@@ -14,27 +15,38 @@ import net.minecraft.resources.Identifier;
 import com.example.itemtweaks.ItemTweaksConfig;
 
 /**
- * ARM MESH SCALING — bare hand only.
+ * ARM MESH TRANSFORM — bare hand only (empty-handed first-person).
  *
- * AvatarRenderer#renderRightHand / renderLeftHand are the only two methods
- * that render the actual arm mesh geometry in first-person.  They are called
- * from ItemInHandRenderer#renderPlayerArm, which itself is only invoked when
- * the hand is EMPTY (no item held).  When holding an item, the arm geometry
- * is rendered by the entity-renderer pipeline, which is entirely separate
- * from ItemInHandRenderer and cannot be intercepted here.
+ * AvatarRenderer#renderRightHand / renderLeftHand render the actual arm mesh
+ * geometry in first-person. They are called from ItemInHandRenderer#renderPlayerArm
+ * only when the hand is EMPTY. All transforms here (offset, tilt, scale) are
+ * therefore gated behind APPLY_HAND_SCALE so they only fire when the user has
+ * opted in to arm customisation.
  *
- * Result: "Apply Hand Scale" visually scales the bare arm when empty-handed.
- * The scale has no effect while holding an item (the entity renderer controls
- * that arm and is out of scope for this mod).
+ * Order: translate (offset) → rotate (tilt) → scale.
  */
 @Mixin(AvatarRenderer.class)
 public abstract class ItemInHandRendererArmMixin {
 
 	@Inject(method = "renderRightHand", at = @At("HEAD"))
-	private void itemtweaks$scaleRightArm(PoseStack poseStack, SubmitNodeCollector collector,
+	private void itemtweaks$transformRightArm(PoseStack poseStack, SubmitNodeCollector collector,
 			int light, Identifier skinTexture, boolean slim, CallbackInfo ci) {
 		if (!ItemTweaksConfig.APPLY_HAND_SCALE) return;
 		poseStack.pushPose();
+
+		// 1. Positional offset — separate values from the held item offsets.
+		float ox = ItemTweaksConfig.ARM_OFFSET_X;
+		float oy = ItemTweaksConfig.ARM_OFFSET_Y;
+		float oz = ItemTweaksConfig.ARM_OFFSET_Z;
+		if (ox != 0.0f || oy != 0.0f || oz != 0.0f) poseStack.translate(ox, oy, oz);
+
+		// 2. Tilt — pitch (X) tips up/down; roll (Z) slants sideways.
+		float pitch = ItemTweaksConfig.ARM_TILT_PITCH;
+		float roll  = ItemTweaksConfig.ARM_TILT_ROLL;
+		if (pitch != 0.0f) poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
+		if (roll  != 0.0f) poseStack.mulPose(Axis.ZP.rotationDegrees(roll));
+
+		// 3. Scale.
 		float s = ItemTweaksConfig.HELD_ITEM_SCALE;
 		if (s != 1.0f) poseStack.scale(s, s, s);
 	}
@@ -47,10 +59,24 @@ public abstract class ItemInHandRendererArmMixin {
 	}
 
 	@Inject(method = "renderLeftHand", at = @At("HEAD"))
-	private void itemtweaks$scaleLeftArm(PoseStack poseStack, SubmitNodeCollector collector,
+	private void itemtweaks$transformLeftArm(PoseStack poseStack, SubmitNodeCollector collector,
 			int light, Identifier skinTexture, boolean slim, CallbackInfo ci) {
 		if (!ItemTweaksConfig.APPLY_HAND_SCALE) return;
 		poseStack.pushPose();
+
+		// 1. Positional offset.
+		float ox = ItemTweaksConfig.ARM_OFFSET_X;
+		float oy = ItemTweaksConfig.ARM_OFFSET_Y;
+		float oz = ItemTweaksConfig.ARM_OFFSET_Z;
+		if (ox != 0.0f || oy != 0.0f || oz != 0.0f) poseStack.translate(ox, oy, oz);
+
+		// 2. Tilt.
+		float pitch = ItemTweaksConfig.ARM_TILT_PITCH;
+		float roll  = ItemTweaksConfig.ARM_TILT_ROLL;
+		if (pitch != 0.0f) poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
+		if (roll  != 0.0f) poseStack.mulPose(Axis.ZP.rotationDegrees(roll));
+
+		// 3. Scale.
 		float s = ItemTweaksConfig.HELD_ITEM_SCALE;
 		if (s != 1.0f) poseStack.scale(s, s, s);
 	}
