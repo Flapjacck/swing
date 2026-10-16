@@ -19,10 +19,16 @@ import net.minecraft.util.Mth;
 public final class ItemTweaksConfig {
 	public static final float MIN = 0.1f;
 	public static final float MAX = 1.0f;
+	public static final float OFFSET_MIN = -1.0f;
+	public static final float OFFSET_MAX = 1.0f;
+	public static final float TILT_MIN = -90.0f;
+	public static final float TILT_MAX = 90.0f;
 	public static final float DEFAULT_HELD_ITEM_SCALE = 1.0f;
 	public static final float DEFAULT_SWING_SPEED = 1.0f;
 	public static final boolean DEFAULT_IGNORE_HASTE = false;
 	public static final boolean DEFAULT_APPLY_HAND_SCALE = false;
+	public static final float DEFAULT_OFFSET = 0.0f;
+	public static final float DEFAULT_TILT = 0.0f;
 
 	/** First-person held item size. 1.0 = vanilla. */
 	public static float HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
@@ -40,6 +46,40 @@ public final class ItemTweaksConfig {
 	/** When true, applies HELD_ITEM_SCALE to the player's hand/arm as well. */
 	public static boolean APPLY_HAND_SCALE = DEFAULT_APPLY_HAND_SCALE;
 
+	/**
+	 * First-person positional offsets for the held item model.
+	 * X = left/right, Y = up/down, Z = forward/back. 0.0 = vanilla position.
+	 */
+	public static float HELD_ITEM_OFFSET_X = DEFAULT_OFFSET;
+	public static float HELD_ITEM_OFFSET_Y = DEFAULT_OFFSET;
+	public static float HELD_ITEM_OFFSET_Z = DEFAULT_OFFSET;
+
+	/**
+	 * First-person tilt (rotation) for the held item model.
+	 * PITCH = X-axis rotation (tips item up/down).
+	 * ROLL  = Z-axis rotation (slants item left/right). Degrees, 0 = vanilla.
+	 */
+	public static float ITEM_TILT_PITCH = DEFAULT_TILT;
+	public static float ITEM_TILT_ROLL  = DEFAULT_TILT;
+
+	/**
+	 * First-person positional offsets for the bare arm (empty hand).
+	 * Only applied when APPLY_HAND_SCALE is true (same gate as arm scale).
+	 * X = left/right, Y = up/down, Z = forward/back. 0.0 = vanilla position.
+	 */
+	public static float ARM_OFFSET_X = DEFAULT_OFFSET;
+	public static float ARM_OFFSET_Y = DEFAULT_OFFSET;
+	public static float ARM_OFFSET_Z = DEFAULT_OFFSET;
+
+	/**
+	 * First-person tilt (rotation) for the bare arm (empty hand).
+	 * Only applied when APPLY_HAND_SCALE is true.
+	 * PITCH = X-axis rotation (tips arm up/down).
+	 * ROLL  = Z-axis rotation (slants arm left/right). Degrees, 0 = vanilla.
+	 */
+	public static float ARM_TILT_PITCH = DEFAULT_TILT;
+	public static float ARM_TILT_ROLL  = DEFAULT_TILT;
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	private ItemTweaksConfig() {}
@@ -48,11 +88,31 @@ public final class ItemTweaksConfig {
 		return Math.round(Mth.clamp(value, MIN, MAX) * 100f) / 100f;
 	}
 
+	/** Clamp an offset value to [OFFSET_MIN, OFFSET_MAX] rounded to 2 dp. */
+	public static float clampOffset(float value) {
+		return Math.round(Mth.clamp(value, OFFSET_MIN, OFFSET_MAX) * 100f) / 100f;
+	}
+
+	/** Clamp a tilt (rotation) value to [TILT_MIN, TILT_MAX] rounded to 2 dp. */
+	public static float clampTilt(float value) {
+		return Math.round(Mth.clamp(value, TILT_MIN, TILT_MAX) * 100f) / 100f;
+	}
+
 	public static void resetToVanilla() {
 		HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
 		SWING_SPEED_MULTIPLIER = DEFAULT_SWING_SPEED;
 		IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
 		APPLY_HAND_SCALE = DEFAULT_APPLY_HAND_SCALE;
+		HELD_ITEM_OFFSET_X = DEFAULT_OFFSET;
+		HELD_ITEM_OFFSET_Y = DEFAULT_OFFSET;
+		HELD_ITEM_OFFSET_Z = DEFAULT_OFFSET;
+		ITEM_TILT_PITCH    = DEFAULT_TILT;
+		ITEM_TILT_ROLL     = DEFAULT_TILT;
+		ARM_OFFSET_X       = DEFAULT_OFFSET;
+		ARM_OFFSET_Y       = DEFAULT_OFFSET;
+		ARM_OFFSET_Z       = DEFAULT_OFFSET;
+		ARM_TILT_PITCH     = DEFAULT_TILT;
+		ARM_TILT_ROLL      = DEFAULT_TILT;
 	}
 
 	public static void load() {
@@ -70,6 +130,16 @@ public final class ItemTweaksConfig {
 			SWING_SPEED_MULTIPLIER = clamp(data.swingSpeedMultiplier);
 			IGNORE_HASTE = data.ignoreHaste;
 			APPLY_HAND_SCALE = data.applyHandScale;
+			HELD_ITEM_OFFSET_X = clampOffset(data.heldItemOffsetX);
+			HELD_ITEM_OFFSET_Y = clampOffset(data.heldItemOffsetY);
+			HELD_ITEM_OFFSET_Z = clampOffset(data.heldItemOffsetZ);
+			ITEM_TILT_PITCH    = clampTilt(data.itemTiltPitch);
+			ITEM_TILT_ROLL     = clampTilt(data.itemTiltRoll);
+			ARM_OFFSET_X       = clampOffset(data.armOffsetX);
+			ARM_OFFSET_Y       = clampOffset(data.armOffsetY);
+			ARM_OFFSET_Z       = clampOffset(data.armOffsetZ);
+			ARM_TILT_PITCH     = clampTilt(data.armTiltPitch);
+			ARM_TILT_ROLL      = clampTilt(data.armTiltRoll);
 		} catch (Exception e) {
 			ItemTweaks.LOGGER.warn("Could not read {}, using vanilla defaults", file, e);
 			resetToVanilla();
@@ -86,6 +156,16 @@ public final class ItemTweaksConfig {
 				data.swingSpeedMultiplier = clamp(SWING_SPEED_MULTIPLIER);
 				data.ignoreHaste = IGNORE_HASTE;
 				data.applyHandScale = APPLY_HAND_SCALE;
+				data.heldItemOffsetX = clampOffset(HELD_ITEM_OFFSET_X);
+				data.heldItemOffsetY = clampOffset(HELD_ITEM_OFFSET_Y);
+				data.heldItemOffsetZ = clampOffset(HELD_ITEM_OFFSET_Z);
+				data.itemTiltPitch   = clampTilt(ITEM_TILT_PITCH);
+				data.itemTiltRoll    = clampTilt(ITEM_TILT_ROLL);
+				data.armOffsetX      = clampOffset(ARM_OFFSET_X);
+				data.armOffsetY      = clampOffset(ARM_OFFSET_Y);
+				data.armOffsetZ      = clampOffset(ARM_OFFSET_Z);
+				data.armTiltPitch    = clampTilt(ARM_TILT_PITCH);
+				data.armTiltRoll     = clampTilt(ARM_TILT_ROLL);
 				GSON.toJson(data, writer);
 			}
 		} catch (IOException e) {
@@ -102,5 +182,15 @@ public final class ItemTweaksConfig {
 		float swingSpeedMultiplier = DEFAULT_SWING_SPEED;
 		boolean ignoreHaste = DEFAULT_IGNORE_HASTE;
 		boolean applyHandScale = DEFAULT_APPLY_HAND_SCALE;
+		float heldItemOffsetX = DEFAULT_OFFSET;
+		float heldItemOffsetY = DEFAULT_OFFSET;
+		float heldItemOffsetZ = DEFAULT_OFFSET;
+		float itemTiltPitch   = DEFAULT_TILT;
+		float itemTiltRoll    = DEFAULT_TILT;
+		float armOffsetX      = DEFAULT_OFFSET;
+		float armOffsetY      = DEFAULT_OFFSET;
+		float armOffsetZ      = DEFAULT_OFFSET;
+		float armTiltPitch    = DEFAULT_TILT;
+		float armTiltRoll     = DEFAULT_TILT;
 	}
 }
