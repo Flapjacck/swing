@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -16,19 +17,33 @@ import net.minecraft.world.item.ItemStack;
 import com.example.itemtweaks.ItemTweaksConfig;
 
 /**
- * FIRST-PERSON HELD ITEM SCALE (item model only).
- * When APPLY_HAND_SCALE is OFF: scales the item model here.
- * When APPLY_HAND_SCALE is ON:  submitHandsWithItems already scales the entire
- *                                viewmodel (arm + item), so we skip the extra
- *                                scale here to avoid double-scaling the item.
+ * FIRST-PERSON HELD ITEM TRANSFORM (item model only).
+ * Applies offset (translate), tilt (pitch + roll rotation), and scale.
+ * Order: translate → rotate → scale, so offset is in unscaled/unrotated space.
  * Push at HEAD and pop at RETURN always keeps the matrix stack balanced.
  */
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
 	@Inject(method = "renderItem", at = @At("HEAD"))
-	private void itemtweaks$pushAndScale(LivingEntity entity, ItemStack stack, ItemDisplayContext ctx,
+	private void itemtweaks$pushAndTransform(LivingEntity entity, ItemStack stack, ItemDisplayContext ctx,
 			PoseStack poseStack, SubmitNodeCollector collector, int light, CallbackInfo ci) {
 		poseStack.pushPose();
+
+		// 1. Positional offset — applied first, in vanilla model space.
+		float ox = ItemTweaksConfig.HELD_ITEM_OFFSET_X;
+		float oy = ItemTweaksConfig.HELD_ITEM_OFFSET_Y;
+		float oz = ItemTweaksConfig.HELD_ITEM_OFFSET_Z;
+		if (ox != 0.0f || oy != 0.0f || oz != 0.0f) {
+			poseStack.translate(ox, oy, oz);
+		}
+
+		// 2. Tilt — pitch (X-axis) tips the item up/down; roll (Z-axis) slants it sideways.
+		float pitch = ItemTweaksConfig.ITEM_TILT_PITCH;
+		float roll  = ItemTweaksConfig.ITEM_TILT_ROLL;
+		if (pitch != 0.0f) poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
+		if (roll  != 0.0f) poseStack.mulPose(Axis.ZP.rotationDegrees(roll));
+
+		// 3. Scale.
 		float s = ItemTweaksConfig.HELD_ITEM_SCALE;
 		if (s != 1.0f) {
 			poseStack.scale(s, s, s);
