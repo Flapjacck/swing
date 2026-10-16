@@ -6,17 +6,13 @@
 	"description": "Client-only: first-person held item scale and visual swing speed.",
 	"authors": ["Spencer Kelly"],
 	"license": "CC0-1.0",
-	"icon": "assets/itemtweaks/icon.png",
+	"icon": "assets/swing/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"client": ["com.example.itemtweaks.client.ItemTweaksClient"]
+		"client": ["com.flapjacck.swing.Swing"]
 	},
 	"mixins": [
-		"swing.mixins.json",
-		{
-			"config": "swing.client.mixins.json",
-			"environment": "client"
-		}
+		"swing.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",

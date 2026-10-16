@@ -1,10 +1,13 @@
-package com.example.itemtweaks;
+package com.flapjacck.swing.config;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,7 +19,9 @@ import net.minecraft.util.Mth;
  * Live tweak values. Mixins read these every frame; GUI writes them in place.
  * Persisted to {@code config/swing.json}.
  */
-public final class ItemTweaksConfig {
+public final class SwingConfig {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SwingConfig.class);
+
 	public static final float MIN = 0.1f;
 	public static final float MAX = 1.0f;
 	public static final float OFFSET_MIN = -1.0f;
@@ -39,7 +44,7 @@ public final class ItemTweaksConfig {
 	/**
 	 * When true, the swing-duration mixin ignores haste / mining-fatigue and
 	 * always starts from the vanilla base of 6 ticks before applying the
-	 * multiplier.  Keeps animation speed constant across islands and gear sets.
+	 * multiplier. Keeps animation speed constant across islands and gear sets.
 	 */
 	public static boolean IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
 
@@ -82,7 +87,7 @@ public final class ItemTweaksConfig {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	private ItemTweaksConfig() {}
+	private SwingConfig() {}
 
 	public static float clamp(float value) {
 		return Math.round(Mth.clamp(value, MIN, MAX) * 100f) / 100f;
@@ -141,7 +146,7 @@ public final class ItemTweaksConfig {
 			ARM_TILT_PITCH     = clampTilt(data.armTiltPitch);
 			ARM_TILT_ROLL      = clampTilt(data.armTiltRoll);
 		} catch (Exception e) {
-			ItemTweaks.LOGGER.warn("Could not read {}, using vanilla defaults", file, e);
+			LOGGER.warn("Could not read {}, using vanilla defaults", file, e);
 			resetToVanilla();
 		}
 	}
@@ -169,7 +174,7 @@ public final class ItemTweaksConfig {
 				GSON.toJson(data, writer);
 			}
 		} catch (IOException e) {
-			ItemTweaks.LOGGER.warn("Could not write {}", file, e);
+			LOGGER.warn("Could not write {}", file, e);
 		}
 	}
 

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/main/resources/assets/itemtweaks/icon.png" alt="Swing icon" width="128" height="128">
+  <img src="src/main/resources/assets/swing/icon.png" alt="Swing icon" width="128" height="128">
 </p>
 
 <h1 align="center">Swing</h1>
