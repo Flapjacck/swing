@@ -3,7 +3,8 @@
 	"package": "com.example.itemtweaks.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ItemInHandRendererMixin"
+		"ItemInHandRendererMixin",
+		"ItemInHandRendererArmMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
