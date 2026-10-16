@@ -16,9 +16,12 @@ import net.minecraft.world.item.ItemStack;
 import com.example.itemtweaks.ItemTweaksConfig;
 
 /**
- * FIRST-PERSON HELD ITEM SCALE.
- * Hook: ItemInHandRenderer#renderItem. Scaling here resizes the item model, not the arm.
- * Push at HEAD and pop at RETURN so the matrix stack stays balanced.
+ * FIRST-PERSON HELD ITEM SCALE (item model only).
+ * When APPLY_HAND_SCALE is OFF: scales the item model here.
+ * When APPLY_HAND_SCALE is ON:  submitHandsWithItems already scales the entire
+ *                                viewmodel (arm + item), so we skip the extra
+ *                                scale here to avoid double-scaling the item.
+ * Push at HEAD and pop at RETURN always keeps the matrix stack balanced.
  */
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
