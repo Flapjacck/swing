@@ -8,85 +8,108 @@ import com.example.itemtweaks.ItemTweaksConfig;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
-/** Settings panel for swing speed and held-item scale. Non-pausing so the player sees changes live. */
+/**
+ * Settings panel for swing speed and held-item scale.
+ * Non-pausing so the player sees changes live; content is scrollable.
+ */
 public class SwingSettingsScreen extends Screen {
 
-	// --- Layout ---
+	// Layout constants
 	private static final int PANEL_W = 320;
-	private static final int PANEL_H = 214;  // expanded to fit ignore-haste toggle row
-	private static final int PAD     = 18;   // horizontal inset on both sides
-	// Slider + 8px gap + box fills the inner width exactly: 320 - 2*18 = 284 = 224 + 8 + 52
+	private static final int PANEL_H = 214;
+	private static final int PAD = 18;
 	private static final int SLIDER_W = 224;
-	private static final int BOX_W    = 52;
-	private static final int CTRL_H   = 20;
-	private static final int BTN_W    = 84;
-	private static final int BTN_GAP  = 8;
+	private static final int BOX_W = 52;
+	private static final int CTRL_H = 20;
+	private static final int BTN_W = 84;
+	private static final int BTN_GAP = 8;
 
-	// Vertical offsets from panel top
-	private static final int TITLE_Y        = 14;
-	private static final int ROW1_LABEL_Y   = 38;
-	private static final int ROW1_CTRL_Y    = 52;
-	private static final int TOGGLE_Y       = 80;  // ignore-haste toggle, 8px below ROW1 controls
-	private static final int ROW2_LABEL_Y   = 114;
-	private static final int ROW2_CTRL_Y    = 128;
-	private static final int SEPARATOR_Y    = 164;
-	private static final int BTN_Y          = 176;
+	// Scroll area
+	private static final int SCROLL_AREA_TOP = 30;
+	private static final int SCROLL_AREA_H = 132;
+	private static final int SCROLL_SPEED = 10;
 
-	// --- Colors (ARGB) ---
-	private static final int COL_BACKDROP    = 0xB0060609;
-	private static final int COL_PANEL       = 0xFF0F0F14;
-	private static final int COL_PANEL_INNER = 0xFF18181E; // 1-shade lighter inset, gives depth
-	private static final int COL_ACCENT      = 0xFF8BDDFF; // soft cyan — the only hue on the panel
-	private static final int COL_SEPARATOR   = 0xFF262630;
-	private static final int COL_TITLE       = 0xFFFFFFFF;
-	private static final int COL_LABEL       = 0xFF8888A0; // muted so labels step back from controls
-	private static final int COL_TEXT        = 0xFFE8E8EE;
-	private static final int COL_TRACK_BG    = 0xFF1A1A22;
-	private static final int COL_TRACK_FILL  = 0xFF2C6A8A;
-	private static final int COL_HANDLE      = 0xFF8BDDFF;
-	private static final int COL_HANDLE_HOV  = 0xFFBDEEFF;
+	// Scrollable content Y offsets (relative to scroll area top)
+	private static final int ROW1_LABEL_Y = 6;
+	private static final int ROW1_CTRL_Y = 16;
+	private static final int TOGGLE_Y = 42;
+	private static final int ROW2_LABEL_Y = 68;
+	private static final int ROW2_CTRL_Y = 78;
+	private static final int HAND_TOGGLE_Y = 104;
+	private static final int CONTENT_BOTTOM = HAND_TOGGLE_Y + CTRL_H;
+	private static final int MAX_SCROLL = Math.max(0, CONTENT_BOTTOM - SCROLL_AREA_H);
+
+	// Fixed footer Y positions
+	private static final int TITLE_Y = 14;
+	private static final int SEPARATOR_Y = 163;
+	private static final int BTN_Y = 175;
+
+	// Colors (ARGB)
+	private static final int COL_BACKDROP = 0xB0060609;
+	private static final int COL_PANEL = 0xFF0F0F14;
+	private static final int COL_PANEL_INNER = 0xFF18181E;
+	private static final int COL_ACCENT = 0xFF8BDDFF;
+	private static final int COL_SEPARATOR = 0xFF262630;
+	private static final int COL_TITLE = 0xFFFFFFFF;
+	private static final int COL_LABEL = 0xFF8888A0;
+	private static final int COL_TEXT = 0xFFE8E8EE;
+	private static final int COL_TRACK_BG = 0xFF1A1A22;
+	private static final int COL_TRACK_FILL = 0xFF2C6A8A;
+	private static final int COL_HANDLE = 0xFF8BDDFF;
+	private static final int COL_HANDLE_HOV = 0xFFBDEEFF;
 	private static final int COL_SLIDER_TEXT = 0xFFD0D0DC;
-	private static final int HANDLE_W        = 6;
+	private static final int HANDLE_W = 6;
 
-	// --- State ---
-	private boolean syncing;      // prevents slider <-> box feedback loops
-	private boolean resetArmed;   // true after first Reset click; second click confirms
+	// State
+	private boolean syncing;
+	private boolean resetArmed;
+	private int scrollOffset;
+
+	// Widget references
 	private FloatSlider swingSlider, scaleSlider;
-	private EditBox     swingBox,    scaleBox;
-	private Button      resetBtn;
-	private Button      hasteToggleBtn;
+	private EditBox swingBox, scaleBox;
+	private Button hasteToggleBtn, handScaleToggleBtn;
+	private Button resetBtn;
 
 	public SwingSettingsScreen() {
 		super(Component.literal("Swing Settings"));
 	}
+
+	/** Create and position all widgets, applying current scroll offset. */
 
 	@Override
 	protected void init() {
 		int px = panelX(), py = panelY();
 		int inner = px + PAD;
 
-		int r1y = py + ROW1_CTRL_Y;
-		this.swingSlider = addRenderableWidget(new FloatSlider(inner, r1y, SLIDER_W, CTRL_H,
+		// Scrollable widgets — positions are set by repositionScrollableWidgets().
+		this.swingSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
 				"Swing speed", ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing, this.font));
-		this.swingBox = addBox(inner + SLIDER_W + 8, r1y, ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing);
+		this.swingBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing);
 
-		// Toggle that makes swing duration constant by ignoring haste/mining-fatigue effects.
 		this.hasteToggleBtn = addRenderableWidget(Button.builder(
 				Component.literal(hasteToggleLabel()), b -> toggleIgnoreHaste())
-				.bounds(inner, py + TOGGLE_Y, SLIDER_W + 8 + BOX_W, CTRL_H).build());
+				.bounds(inner, 0, SLIDER_W + 8 + BOX_W, CTRL_H).build());
 
-		int r2y = py + ROW2_CTRL_Y;
-		this.scaleSlider = addRenderableWidget(new FloatSlider(inner, r2y, SLIDER_W, CTRL_H,
+		this.scaleSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
 				"Held item scale", ItemTweaksConfig.HELD_ITEM_SCALE, this::applyScale, this.font));
-		this.scaleBox = addBox(inner + SLIDER_W + 8, r2y, ItemTweaksConfig.HELD_ITEM_SCALE, this::applyScale);
+		this.scaleBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.HELD_ITEM_SCALE, this::applyScale);
 
-		// Two buttons centered: Reset and Close (Apply removed — onClose auto-saves)
+		this.handScaleToggleBtn = addRenderableWidget(Button.builder(
+				Component.literal(handScaleToggleLabel()), b -> toggleApplyHandScale())
+				.bounds(inner, 0, SLIDER_W + 8 + BOX_W, CTRL_H).build());
+
+		// Apply current scroll offset to all scrollable widgets.
+		repositionScrollableWidgets();
+
+		// Fixed footer – Reset and Close stay anchored regardless of scroll.
 		int totalBtnW = BTN_W * 2 + BTN_GAP;
 		int btnLeft   = px + (PANEL_W - totalBtnW) / 2;
 		int by        = py + BTN_Y;
@@ -96,7 +119,45 @@ public class SwingSettingsScreen extends Screen {
 				.bounds(btnLeft + BTN_W + BTN_GAP, by, BTN_W, CTRL_H).build());
 	}
 
-	/** Creates a numeric text box that feeds into {@code apply} on every keystroke. */
+	/** Reposition scrollable widgets based on scroll offset; clips widgets outside the view. */
+	private void repositionScrollableWidgets() {
+		int scrollBase = panelY() + SCROLL_AREA_TOP;
+		int clipTop    = scrollBase;
+		int clipBot    = scrollBase + SCROLL_AREA_H;
+		int inner      = panelX() + PAD;
+
+		placeWidget(swingSlider,       inner,              scrollBase + ROW1_CTRL_Y   - scrollOffset, clipTop, clipBot);
+		placeWidget(swingBox,          inner + SLIDER_W + 8, scrollBase + ROW1_CTRL_Y - scrollOffset, clipTop, clipBot);
+		placeWidget(hasteToggleBtn,    inner,              scrollBase + TOGGLE_Y      - scrollOffset, clipTop, clipBot);
+		placeWidget(scaleSlider,       inner,              scrollBase + ROW2_CTRL_Y   - scrollOffset, clipTop, clipBot);
+		placeWidget(scaleBox,          inner + SLIDER_W + 8, scrollBase + ROW2_CTRL_Y - scrollOffset, clipTop, clipBot);
+		placeWidget(handScaleToggleBtn, inner,             scrollBase + HAND_TOGGLE_Y - scrollOffset, clipTop, clipBot);
+	}
+
+	/** Move and show/hide widget based on scroll clipping. */
+	private void placeWidget(AbstractWidget w, int x, int y, int clipTop, int clipBot) {
+		if (w == null) return;
+		w.setX(x);
+		w.setY(y);
+		w.visible = (y + CTRL_H > clipTop) && (y < clipBot);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		int px = panelX(), py = panelY();
+		int clipTop = py + SCROLL_AREA_TOP;
+		int clipBot = clipTop + SCROLL_AREA_H;
+
+		// Only respond to scroll events within the scroll area.
+		if (mouseX >= px && mouseX < px + PANEL_W && mouseY >= clipTop && mouseY < clipBot) {
+			scrollOffset = Mth.clamp(scrollOffset - (int)(scrollY * SCROLL_SPEED), 0, MAX_SCROLL);
+			repositionScrollableWidgets();
+			return true;
+		}
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+	}
+
+	/** Create a numeric text box bound to an apply callback. */
 	private EditBox addBox(int x, int y, float value, DoubleConsumer apply) {
 		EditBox box = new EditBox(this.font, x, y, BOX_W, CTRL_H, Component.literal("value"));
 		box.setMaxLength(4);
@@ -112,16 +173,24 @@ public class SwingSettingsScreen extends Screen {
 		return addRenderableWidget(box);
 	}
 
-	/** Returns the button label reflecting the current IGNORE_HASTE state. */
 	private static String hasteToggleLabel() {
 		return ItemTweaksConfig.IGNORE_HASTE ? "Ignore Haste: ON" : "Ignore Haste: OFF";
 	}
 
 	private void toggleIgnoreHaste() {
 		ItemTweaksConfig.IGNORE_HASTE = !ItemTweaksConfig.IGNORE_HASTE;
-		if (this.hasteToggleBtn != null) {
+		if (this.hasteToggleBtn != null)
 			this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
-		}
+	}
+
+	private static String handScaleToggleLabel() {
+		return ItemTweaksConfig.APPLY_HAND_SCALE ? "Apply Hand Scale: ON" : "Apply Hand Scale: OFF";
+	}
+
+	private void toggleApplyHandScale() {
+		ItemTweaksConfig.APPLY_HAND_SCALE = !ItemTweaksConfig.APPLY_HAND_SCALE;
+		if (this.handScaleToggleBtn != null)
+			this.handScaleToggleBtn.setMessage(Component.literal(handScaleToggleLabel()));
 	}
 
 	private void applySwing(double raw) {
@@ -140,18 +209,17 @@ public class SwingSettingsScreen extends Screen {
 		if (this.syncing) return;
 		this.syncing = true;
 		if (slider != null) slider.setFromFloat(v);
-		if (box != null && !box.isFocused()) box.setValue(fmt(v)); // don't interrupt active typing
+		if (box != null && !box.isFocused()) box.setValue(fmt(v));
 		this.syncing = false;
 	}
 
-	/** First click arms Reset ("Confirm?"); second click within the same session resets. */
+	/** First click arms the reset; second click confirms. */
 	private void onResetClick() {
 		if (!this.resetArmed) {
 			this.resetArmed = true;
 			this.resetBtn.setMessage(Component.literal("Confirm?"));
 			return;
 		}
-		// Second click — do the actual reset
 		this.resetArmed = false;
 		this.resetBtn.setMessage(Component.literal("Reset"));
 		ItemTweaksConfig.resetToVanilla();
@@ -161,6 +229,7 @@ public class SwingSettingsScreen extends Screen {
 		this.swingBox.setValue(fmt(ItemTweaksConfig.SWING_SPEED_MULTIPLIER));
 		this.scaleBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_SCALE));
 		this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
+		this.handScaleToggleBtn.setMessage(Component.literal(handScaleToggleLabel()));
 		this.syncing = false;
 	}
 
@@ -172,7 +241,7 @@ public class SwingSettingsScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean b) {
-		// If the player clicks anywhere other than the reset button while it's armed, disarm it.
+		// Disarm the reset button if the user clicks elsewhere.
 		if (this.resetArmed && !this.resetBtn.isMouseOver(event.x(), event.y())) {
 			this.resetArmed = false;
 			this.resetBtn.setMessage(Component.literal("Reset"));
@@ -181,14 +250,11 @@ public class SwingSettingsScreen extends Screen {
 	}
 
 	@Override
-	public boolean isPauseScreen() {
-		return false; // game keeps ticking so the player sees changes live
-	}
+	public boolean isPauseScreen() { return false; }
 
 	@Override
 	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		if (this.minecraft.level != null) extractBlurredBackground(graphics);
-		// Translucent veil — dark enough to frame the panel, light enough to see the world.
 		graphics.fill(0, 0, this.width, this.height, COL_BACKDROP);
 		renderPanel(graphics);
 		renderLabels(graphics);
@@ -201,21 +267,32 @@ public class SwingSettingsScreen extends Screen {
 		int pr = px + PANEL_W, pb = py + PANEL_H;
 
 		graphics.fill(px, py, pr, pb, COL_PANEL);
-		// Inner zone inset 1px; top starts after accent stripe so it isn't overdrawn.
 		graphics.fill(px + 1, py + 3, pr - 1, pb - 1, COL_PANEL_INNER);
 		graphics.fill(px, py, pr, py + 2, COL_ACCENT);
-		// Thin separator between the settings area and the button row.
 		graphics.fill(px + PAD, py + SEPARATOR_Y, pr - PAD, py + SEPARATOR_Y + 1, COL_SEPARATOR);
 	}
 
-	/** Title (centered) and section labels drawn directly in the background pass. */
+	/**
+	 * Title and section labels. Labels scroll with content; they are not drawn
+	 * if they would fall fully outside the scroll area.
+	 */
 	private void renderLabels(GuiGraphicsExtractor graphics) {
 		int px = panelX(), py = panelY();
+		int scrollBase = py + SCROLL_AREA_TOP;
+		int clipTop    = scrollBase;
+		int clipBot    = scrollBase + SCROLL_AREA_H;
+
 		String title = "Swing Settings";
-		graphics.text(this.font, title, px + (PANEL_W - this.font.width(title)) / 2,
-				py + TITLE_Y, COL_TITLE, true);
-		graphics.text(this.font, "Swing Speed",     px + PAD, py + ROW1_LABEL_Y, COL_LABEL, false);
-		graphics.text(this.font, "Held Item Scale", px + PAD, py + ROW2_LABEL_Y, COL_LABEL, false);
+		graphics.text(this.font, title,
+				px + (PANEL_W - this.font.width(title)) / 2, py + TITLE_Y, COL_TITLE, true);
+
+		int y1 = scrollBase + ROW1_LABEL_Y - scrollOffset;
+		if (y1 >= clipTop && y1 < clipBot)
+			graphics.text(this.font, "Swing Speed", px + PAD, y1, COL_LABEL, false);
+
+		int y2 = scrollBase + ROW2_LABEL_Y - scrollOffset;
+		if (y2 >= clipTop && y2 < clipBot)
+			graphics.text(this.font, "Held Item Scale", px + PAD, y2, COL_LABEL, false);
 	}
 
 	private int panelX() { return (this.width  - PANEL_W) / 2; }
@@ -223,16 +300,11 @@ public class SwingSettingsScreen extends Screen {
 
 	private static String fmt(float v) { return String.format(Locale.US, "%.2f", v); }
 
-
-	/**
-	 * Flat custom-rendered slider
-	 * Track is three rects: dark background, cyan active fill, bright handle knob.
-	 * Handle brightens on hover. Value is drawn centered on the track.
-	 */
+	/** Custom flat slider with dark track, cyan fill, and value label. */
 	private static final class FloatSlider extends AbstractSliderButton {
-		private final String       label;
+		private final String        label;
 		private final DoubleConsumer onChange;
-		private final Font         font; // needed for text width + rendering inside extractWidgetRenderState
+		private final Font          font;
 
 		FloatSlider(int x, int y, int w, int h, String label, float current,
 				DoubleConsumer onChange, Font font) {
@@ -263,14 +335,14 @@ public class SwingSettingsScreen extends Screen {
 
 			graphics.fill(x, y, x + w, y + h, COL_TRACK_BG);
 			if (handleX > x) graphics.fill(x, y, handleX, y + h, COL_TRACK_FILL);
-			// Handle is 1px taller than the track so it looks like it's lifted above the surface.
+			// Handle sits 1px taller than the track to look "lifted."
 			graphics.fill(handleX, y - 1, handleX + HANDLE_W, y + h + 1,
 					isHovered() ? COL_HANDLE_HOV : COL_HANDLE);
 
 			String text = this.label + ": " + fmt(ItemTweaksConfig.clamp(toFloat()));
 			graphics.text(this.font, text,
 					x + (w - this.font.width(text)) / 2,
-					y + (h - 8) / 2, // vertically center the 8px-tall MC font
+					y + (h - 8) / 2,
 					COL_SLIDER_TEXT, true);
 		}
 	}
