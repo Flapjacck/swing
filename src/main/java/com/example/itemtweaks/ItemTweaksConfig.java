@@ -22,6 +22,7 @@ public final class ItemTweaksConfig {
 	public static final float DEFAULT_HELD_ITEM_SCALE = 1.0f;
 	public static final float DEFAULT_SWING_SPEED = 1.0f;
 	public static final boolean DEFAULT_IGNORE_HASTE = false;
+	public static final boolean DEFAULT_APPLY_HAND_SCALE = false;
 
 	/** First-person held item size. 1.0 = vanilla. */
 	public static float HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
@@ -36,6 +37,9 @@ public final class ItemTweaksConfig {
 	 */
 	public static boolean IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
 
+	/** When true, applies HELD_ITEM_SCALE to the player's hand/arm as well. */
+	public static boolean APPLY_HAND_SCALE = DEFAULT_APPLY_HAND_SCALE;
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	private ItemTweaksConfig() {}
@@ -48,6 +52,7 @@ public final class ItemTweaksConfig {
 		HELD_ITEM_SCALE = DEFAULT_HELD_ITEM_SCALE;
 		SWING_SPEED_MULTIPLIER = DEFAULT_SWING_SPEED;
 		IGNORE_HASTE = DEFAULT_IGNORE_HASTE;
+		APPLY_HAND_SCALE = DEFAULT_APPLY_HAND_SCALE;
 	}
 
 	public static void load() {
@@ -64,6 +69,7 @@ public final class ItemTweaksConfig {
 			HELD_ITEM_SCALE = clamp(data.heldItemScale);
 			SWING_SPEED_MULTIPLIER = clamp(data.swingSpeedMultiplier);
 			IGNORE_HASTE = data.ignoreHaste;
+			APPLY_HAND_SCALE = data.applyHandScale;
 		} catch (Exception e) {
 			ItemTweaks.LOGGER.warn("Could not read {}, using vanilla defaults", file, e);
 			resetToVanilla();
@@ -79,6 +85,7 @@ public final class ItemTweaksConfig {
 				data.heldItemScale = clamp(HELD_ITEM_SCALE);
 				data.swingSpeedMultiplier = clamp(SWING_SPEED_MULTIPLIER);
 				data.ignoreHaste = IGNORE_HASTE;
+				data.applyHandScale = APPLY_HAND_SCALE;
 				GSON.toJson(data, writer);
 			}
 		} catch (IOException e) {
@@ -94,5 +101,6 @@ public final class ItemTweaksConfig {
 		float heldItemScale = DEFAULT_HELD_ITEM_SCALE;
 		float swingSpeedMultiplier = DEFAULT_SWING_SPEED;
 		boolean ignoreHaste = DEFAULT_IGNORE_HASTE;
+		boolean applyHandScale = DEFAULT_APPLY_HAND_SCALE;
 	}
 }
