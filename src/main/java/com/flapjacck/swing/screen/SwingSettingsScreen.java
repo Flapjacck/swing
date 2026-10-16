@@ -1,9 +1,9 @@
-package com.example.itemtweaks.client;
+package com.flapjacck.swing.screen;
 
 import java.util.Locale;
 import java.util.function.DoubleConsumer;
 
-import com.example.itemtweaks.ItemTweaksConfig;
+import com.flapjacck.swing.config.SwingConfig;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -122,62 +122,62 @@ public class SwingSettingsScreen extends Screen {
 	protected void init() {
 		int px = panelX(), py = panelY();
 		int inner = px + PAD;
-		float omin = ItemTweaksConfig.OFFSET_MIN, omax = ItemTweaksConfig.OFFSET_MAX;
-		float tmin = ItemTweaksConfig.TILT_MIN,   tmax = ItemTweaksConfig.TILT_MAX;
+		float omin = SwingConfig.OFFSET_MIN, omax = SwingConfig.OFFSET_MAX;
+		float tmin = SwingConfig.TILT_MIN,   tmax = SwingConfig.TILT_MAX;
 
 		// — Section 1: Swing speed —
 		this.swingSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Swing speed", ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing, this.font));
-		this.swingBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.SWING_SPEED_MULTIPLIER, this::applySwing);
+				"Swing speed", SwingConfig.SWING_SPEED_MULTIPLIER, this::applySwing, this.font));
+		this.swingBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.SWING_SPEED_MULTIPLIER, this::applySwing);
 		this.hasteToggleBtn = addRenderableWidget(Button.builder(
 				Component.literal(hasteToggleLabel()), b -> toggleIgnoreHaste())
 				.bounds(inner, 0, SLIDER_W + 8 + BOX_W, CTRL_H).build());
 
 		// — Section 2: Held item scale —
 		this.scaleSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Held item scale", ItemTweaksConfig.HELD_ITEM_SCALE, this::applyScale, this.font));
-		this.scaleBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.HELD_ITEM_SCALE, this::applyScale);
+				"Held item scale", SwingConfig.HELD_ITEM_SCALE, this::applyScale, this.font));
+		this.scaleBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.HELD_ITEM_SCALE, this::applyScale);
 		this.handScaleToggleBtn = addRenderableWidget(Button.builder(
 				Component.literal(handScaleToggleLabel()), b -> toggleApplyHandScale())
 				.bounds(inner, 0, SLIDER_W + 8 + BOX_W, CTRL_H).build());
 
 		// — Section 3: Item offsets —
 		this.itemOffsetXSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Item X", ItemTweaksConfig.HELD_ITEM_OFFSET_X, this::applyItemOffsetX, this.font, omin, omax));
-		this.itemOffsetXBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.HELD_ITEM_OFFSET_X, this::applyItemOffsetX);
+				"Item X", SwingConfig.HELD_ITEM_OFFSET_X, this::applyItemOffsetX, this.font, omin, omax));
+		this.itemOffsetXBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.HELD_ITEM_OFFSET_X, this::applyItemOffsetX);
 		this.itemOffsetYSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Item Y", ItemTweaksConfig.HELD_ITEM_OFFSET_Y, this::applyItemOffsetY, this.font, omin, omax));
-		this.itemOffsetYBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.HELD_ITEM_OFFSET_Y, this::applyItemOffsetY);
+				"Item Y", SwingConfig.HELD_ITEM_OFFSET_Y, this::applyItemOffsetY, this.font, omin, omax));
+		this.itemOffsetYBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.HELD_ITEM_OFFSET_Y, this::applyItemOffsetY);
 		this.itemOffsetZSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Item Z", ItemTweaksConfig.HELD_ITEM_OFFSET_Z, this::applyItemOffsetZ, this.font, omin, omax));
-		this.itemOffsetZBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.HELD_ITEM_OFFSET_Z, this::applyItemOffsetZ);
+				"Item Z", SwingConfig.HELD_ITEM_OFFSET_Z, this::applyItemOffsetZ, this.font, omin, omax));
+		this.itemOffsetZBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.HELD_ITEM_OFFSET_Z, this::applyItemOffsetZ);
 
 		// — Section 4: Item tilt —
 		this.itemTiltPitchSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Item Pitch", ItemTweaksConfig.ITEM_TILT_PITCH, this::applyItemTiltPitch, this.font, tmin, tmax));
-		this.itemTiltPitchBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ITEM_TILT_PITCH, this::applyItemTiltPitch);
+				"Item Pitch", SwingConfig.ITEM_TILT_PITCH, this::applyItemTiltPitch, this.font, tmin, tmax));
+		this.itemTiltPitchBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ITEM_TILT_PITCH, this::applyItemTiltPitch);
 		this.itemTiltRollSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Item Roll", ItemTweaksConfig.ITEM_TILT_ROLL, this::applyItemTiltRoll, this.font, tmin, tmax));
-		this.itemTiltRollBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ITEM_TILT_ROLL, this::applyItemTiltRoll);
+				"Item Roll", SwingConfig.ITEM_TILT_ROLL, this::applyItemTiltRoll, this.font, tmin, tmax));
+		this.itemTiltRollBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ITEM_TILT_ROLL, this::applyItemTiltRoll);
 
 		// — Section 5: Arm offsets —
 		this.armOffsetXSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Arm X", ItemTweaksConfig.ARM_OFFSET_X, this::applyArmOffsetX, this.font, omin, omax));
-		this.armOffsetXBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ARM_OFFSET_X, this::applyArmOffsetX);
+				"Arm X", SwingConfig.ARM_OFFSET_X, this::applyArmOffsetX, this.font, omin, omax));
+		this.armOffsetXBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ARM_OFFSET_X, this::applyArmOffsetX);
 		this.armOffsetYSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Arm Y", ItemTweaksConfig.ARM_OFFSET_Y, this::applyArmOffsetY, this.font, omin, omax));
-		this.armOffsetYBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ARM_OFFSET_Y, this::applyArmOffsetY);
+				"Arm Y", SwingConfig.ARM_OFFSET_Y, this::applyArmOffsetY, this.font, omin, omax));
+		this.armOffsetYBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ARM_OFFSET_Y, this::applyArmOffsetY);
 		this.armOffsetZSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Arm Z", ItemTweaksConfig.ARM_OFFSET_Z, this::applyArmOffsetZ, this.font, omin, omax));
-		this.armOffsetZBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ARM_OFFSET_Z, this::applyArmOffsetZ);
+				"Arm Z", SwingConfig.ARM_OFFSET_Z, this::applyArmOffsetZ, this.font, omin, omax));
+		this.armOffsetZBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ARM_OFFSET_Z, this::applyArmOffsetZ);
 
 		// — Section 6: Arm tilt —
 		this.armTiltPitchSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Arm Pitch", ItemTweaksConfig.ARM_TILT_PITCH, this::applyArmTiltPitch, this.font, tmin, tmax));
-		this.armTiltPitchBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ARM_TILT_PITCH, this::applyArmTiltPitch);
+				"Arm Pitch", SwingConfig.ARM_TILT_PITCH, this::applyArmTiltPitch, this.font, tmin, tmax));
+		this.armTiltPitchBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ARM_TILT_PITCH, this::applyArmTiltPitch);
 		this.armTiltRollSlider = addRenderableWidget(new FloatSlider(inner, 0, SLIDER_W, CTRL_H,
-				"Arm Roll", ItemTweaksConfig.ARM_TILT_ROLL, this::applyArmTiltRoll, this.font, tmin, tmax));
-		this.armTiltRollBox = addBox(inner + SLIDER_W + 8, 0, ItemTweaksConfig.ARM_TILT_ROLL, this::applyArmTiltRoll);
+				"Arm Roll", SwingConfig.ARM_TILT_ROLL, this::applyArmTiltRoll, this.font, tmin, tmax));
+		this.armTiltRollBox = addBox(inner + SLIDER_W + 8, 0, SwingConfig.ARM_TILT_ROLL, this::applyArmTiltRoll);
 
 		repositionScrollableWidgets();
 
@@ -264,19 +264,19 @@ public class SwingSettingsScreen extends Screen {
 	// ── Toggle labels & handlers ─────────────────────────────────────────────────
 
 	private static String hasteToggleLabel() {
-		return ItemTweaksConfig.IGNORE_HASTE ? "Ignore Haste: ON" : "Ignore Haste: OFF";
+		return SwingConfig.IGNORE_HASTE ? "Ignore Haste: ON" : "Ignore Haste: OFF";
 	}
 	private void toggleIgnoreHaste() {
-		ItemTweaksConfig.IGNORE_HASTE = !ItemTweaksConfig.IGNORE_HASTE;
+		SwingConfig.IGNORE_HASTE = !SwingConfig.IGNORE_HASTE;
 		if (this.hasteToggleBtn != null)
 			this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
 	}
 
 	private static String handScaleToggleLabel() {
-		return ItemTweaksConfig.APPLY_HAND_SCALE ? "Apply Hand Scale: ON" : "Apply Hand Scale: OFF";
+		return SwingConfig.APPLY_HAND_SCALE ? "Apply Hand Scale: ON" : "Apply Hand Scale: OFF";
 	}
 	private void toggleApplyHandScale() {
-		ItemTweaksConfig.APPLY_HAND_SCALE = !ItemTweaksConfig.APPLY_HAND_SCALE;
+		SwingConfig.APPLY_HAND_SCALE = !SwingConfig.APPLY_HAND_SCALE;
 		if (this.handScaleToggleBtn != null)
 			this.handScaleToggleBtn.setMessage(Component.literal(handScaleToggleLabel()));
 	}
@@ -284,63 +284,63 @@ public class SwingSettingsScreen extends Screen {
 	// ── Apply callbacks ──────────────────────────────────────────────────────────
 
 	private void applySwing(double raw) {
-		float v = ItemTweaksConfig.clamp((float) raw);
-		ItemTweaksConfig.SWING_SPEED_MULTIPLIER = v;
+		float v = SwingConfig.clamp((float) raw);
+		SwingConfig.SWING_SPEED_MULTIPLIER = v;
 		sync(this.swingSlider, this.swingBox, v);
 	}
 	private void applyScale(double raw) {
-		float v = ItemTweaksConfig.clamp((float) raw);
-		ItemTweaksConfig.HELD_ITEM_SCALE = v;
+		float v = SwingConfig.clamp((float) raw);
+		SwingConfig.HELD_ITEM_SCALE = v;
 		sync(this.scaleSlider, this.scaleBox, v);
 	}
 	private void applyItemOffsetX(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.HELD_ITEM_OFFSET_X = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.HELD_ITEM_OFFSET_X = v;
 		sync(this.itemOffsetXSlider, this.itemOffsetXBox, v);
 	}
 	private void applyItemOffsetY(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.HELD_ITEM_OFFSET_Y = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.HELD_ITEM_OFFSET_Y = v;
 		sync(this.itemOffsetYSlider, this.itemOffsetYBox, v);
 	}
 	private void applyItemOffsetZ(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.HELD_ITEM_OFFSET_Z = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.HELD_ITEM_OFFSET_Z = v;
 		sync(this.itemOffsetZSlider, this.itemOffsetZBox, v);
 	}
 	private void applyItemTiltPitch(double raw) {
-		float v = ItemTweaksConfig.clampTilt((float) raw);
-		ItemTweaksConfig.ITEM_TILT_PITCH = v;
+		float v = SwingConfig.clampTilt((float) raw);
+		SwingConfig.ITEM_TILT_PITCH = v;
 		sync(this.itemTiltPitchSlider, this.itemTiltPitchBox, v);
 	}
 	private void applyItemTiltRoll(double raw) {
-		float v = ItemTweaksConfig.clampTilt((float) raw);
-		ItemTweaksConfig.ITEM_TILT_ROLL = v;
+		float v = SwingConfig.clampTilt((float) raw);
+		SwingConfig.ITEM_TILT_ROLL = v;
 		sync(this.itemTiltRollSlider, this.itemTiltRollBox, v);
 	}
 	private void applyArmOffsetX(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.ARM_OFFSET_X = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.ARM_OFFSET_X = v;
 		sync(this.armOffsetXSlider, this.armOffsetXBox, v);
 	}
 	private void applyArmOffsetY(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.ARM_OFFSET_Y = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.ARM_OFFSET_Y = v;
 		sync(this.armOffsetYSlider, this.armOffsetYBox, v);
 	}
 	private void applyArmOffsetZ(double raw) {
-		float v = ItemTweaksConfig.clampOffset((float) raw);
-		ItemTweaksConfig.ARM_OFFSET_Z = v;
+		float v = SwingConfig.clampOffset((float) raw);
+		SwingConfig.ARM_OFFSET_Z = v;
 		sync(this.armOffsetZSlider, this.armOffsetZBox, v);
 	}
 	private void applyArmTiltPitch(double raw) {
-		float v = ItemTweaksConfig.clampTilt((float) raw);
-		ItemTweaksConfig.ARM_TILT_PITCH = v;
+		float v = SwingConfig.clampTilt((float) raw);
+		SwingConfig.ARM_TILT_PITCH = v;
 		sync(this.armTiltPitchSlider, this.armTiltPitchBox, v);
 	}
 	private void applyArmTiltRoll(double raw) {
-		float v = ItemTweaksConfig.clampTilt((float) raw);
-		ItemTweaksConfig.ARM_TILT_ROLL = v;
+		float v = SwingConfig.clampTilt((float) raw);
+		SwingConfig.ARM_TILT_ROLL = v;
 		sync(this.armTiltRollSlider, this.armTiltRollBox, v);
 	}
 
@@ -363,40 +363,40 @@ public class SwingSettingsScreen extends Screen {
 		}
 		this.resetArmed = false;
 		this.resetBtn.setMessage(Component.literal("Reset"));
-		ItemTweaksConfig.resetToVanilla();
+		SwingConfig.resetToVanilla();
 		this.syncing = true;
 		// Section 1
-		this.swingSlider.setFromFloat(ItemTweaksConfig.SWING_SPEED_MULTIPLIER);
-		this.swingBox.setValue(fmt(ItemTweaksConfig.SWING_SPEED_MULTIPLIER));
+		this.swingSlider.setFromFloat(SwingConfig.SWING_SPEED_MULTIPLIER);
+		this.swingBox.setValue(fmt(SwingConfig.SWING_SPEED_MULTIPLIER));
 		this.hasteToggleBtn.setMessage(Component.literal(hasteToggleLabel()));
 		// Section 2
-		this.scaleSlider.setFromFloat(ItemTweaksConfig.HELD_ITEM_SCALE);
-		this.scaleBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_SCALE));
+		this.scaleSlider.setFromFloat(SwingConfig.HELD_ITEM_SCALE);
+		this.scaleBox.setValue(fmt(SwingConfig.HELD_ITEM_SCALE));
 		this.handScaleToggleBtn.setMessage(Component.literal(handScaleToggleLabel()));
 		// Section 3
-		this.itemOffsetXSlider.setFromFloat(ItemTweaksConfig.HELD_ITEM_OFFSET_X);
-		this.itemOffsetXBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_OFFSET_X));
-		this.itemOffsetYSlider.setFromFloat(ItemTweaksConfig.HELD_ITEM_OFFSET_Y);
-		this.itemOffsetYBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_OFFSET_Y));
-		this.itemOffsetZSlider.setFromFloat(ItemTweaksConfig.HELD_ITEM_OFFSET_Z);
-		this.itemOffsetZBox.setValue(fmt(ItemTweaksConfig.HELD_ITEM_OFFSET_Z));
+		this.itemOffsetXSlider.setFromFloat(SwingConfig.HELD_ITEM_OFFSET_X);
+		this.itemOffsetXBox.setValue(fmt(SwingConfig.HELD_ITEM_OFFSET_X));
+		this.itemOffsetYSlider.setFromFloat(SwingConfig.HELD_ITEM_OFFSET_Y);
+		this.itemOffsetYBox.setValue(fmt(SwingConfig.HELD_ITEM_OFFSET_Y));
+		this.itemOffsetZSlider.setFromFloat(SwingConfig.HELD_ITEM_OFFSET_Z);
+		this.itemOffsetZBox.setValue(fmt(SwingConfig.HELD_ITEM_OFFSET_Z));
 		// Section 4
-		this.itemTiltPitchSlider.setFromFloat(ItemTweaksConfig.ITEM_TILT_PITCH);
-		this.itemTiltPitchBox.setValue(fmt(ItemTweaksConfig.ITEM_TILT_PITCH));
-		this.itemTiltRollSlider.setFromFloat(ItemTweaksConfig.ITEM_TILT_ROLL);
-		this.itemTiltRollBox.setValue(fmt(ItemTweaksConfig.ITEM_TILT_ROLL));
+		this.itemTiltPitchSlider.setFromFloat(SwingConfig.ITEM_TILT_PITCH);
+		this.itemTiltPitchBox.setValue(fmt(SwingConfig.ITEM_TILT_PITCH));
+		this.itemTiltRollSlider.setFromFloat(SwingConfig.ITEM_TILT_ROLL);
+		this.itemTiltRollBox.setValue(fmt(SwingConfig.ITEM_TILT_ROLL));
 		// Section 5
-		this.armOffsetXSlider.setFromFloat(ItemTweaksConfig.ARM_OFFSET_X);
-		this.armOffsetXBox.setValue(fmt(ItemTweaksConfig.ARM_OFFSET_X));
-		this.armOffsetYSlider.setFromFloat(ItemTweaksConfig.ARM_OFFSET_Y);
-		this.armOffsetYBox.setValue(fmt(ItemTweaksConfig.ARM_OFFSET_Y));
-		this.armOffsetZSlider.setFromFloat(ItemTweaksConfig.ARM_OFFSET_Z);
-		this.armOffsetZBox.setValue(fmt(ItemTweaksConfig.ARM_OFFSET_Z));
+		this.armOffsetXSlider.setFromFloat(SwingConfig.ARM_OFFSET_X);
+		this.armOffsetXBox.setValue(fmt(SwingConfig.ARM_OFFSET_X));
+		this.armOffsetYSlider.setFromFloat(SwingConfig.ARM_OFFSET_Y);
+		this.armOffsetYBox.setValue(fmt(SwingConfig.ARM_OFFSET_Y));
+		this.armOffsetZSlider.setFromFloat(SwingConfig.ARM_OFFSET_Z);
+		this.armOffsetZBox.setValue(fmt(SwingConfig.ARM_OFFSET_Z));
 		// Section 6
-		this.armTiltPitchSlider.setFromFloat(ItemTweaksConfig.ARM_TILT_PITCH);
-		this.armTiltPitchBox.setValue(fmt(ItemTweaksConfig.ARM_TILT_PITCH));
-		this.armTiltRollSlider.setFromFloat(ItemTweaksConfig.ARM_TILT_ROLL);
-		this.armTiltRollBox.setValue(fmt(ItemTweaksConfig.ARM_TILT_ROLL));
+		this.armTiltPitchSlider.setFromFloat(SwingConfig.ARM_TILT_PITCH);
+		this.armTiltPitchBox.setValue(fmt(SwingConfig.ARM_TILT_PITCH));
+		this.armTiltRollSlider.setFromFloat(SwingConfig.ARM_TILT_ROLL);
+		this.armTiltRollBox.setValue(fmt(SwingConfig.ARM_TILT_ROLL));
 		this.syncing = false;
 	}
 
@@ -404,7 +404,7 @@ public class SwingSettingsScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		ItemTweaksConfig.save();
+		SwingConfig.save();
 		super.onClose();
 	}
 
@@ -487,7 +487,7 @@ public class SwingSettingsScreen extends Screen {
 		FloatSlider(int x, int y, int w, int h, String label, float current,
 				DoubleConsumer onChange, Font font) {
 			this(x, y, w, h, label, current, onChange, font,
-					ItemTweaksConfig.MIN, ItemTweaksConfig.MAX);
+					SwingConfig.MIN, SwingConfig.MAX);
 		}
 
 		/** Full constructor — use for offset or tilt sliders with a custom range. */

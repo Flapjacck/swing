@@ -1,11 +1,13 @@
-package com.example.itemtweaks.client;
+package com.flapjacck.swing.command;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+
+import com.flapjacck.swing.screen.SwingSettingsScreen;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 
-/** {@code /swing} opens the in-game settings screen on the next client tick. */
+/** {@code /swing} opens the settings screen on the next client tick. */
 public final class SwingCommandHandler {
 	private SwingCommandHandler() {}
 

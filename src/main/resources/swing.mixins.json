@@ -1,9 +1,11 @@
 {
 	"required": true,
-	"package": "com.example.itemtweaks.mixin",
+	"package": "com.flapjacck.swing.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"LivingEntitySwingMixin"
+		"LivingEntitySwingMixin",
+		"ItemInHandRendererMixin",
+		"ItemInHandRendererArmMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
